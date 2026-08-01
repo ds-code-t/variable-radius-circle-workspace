@@ -1,0 +1,12 @@
+.gradle/
+.gradle-bootstrap/
+build/
+out/
+.idea/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+Thumbs.db
+hs_err_pid*
+replay_pid*

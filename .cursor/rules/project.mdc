@@ -1,0 +1,8 @@
+---
+description: Canonical variable-radius circle workspace instructions
+alwaysApply: true
+---
+
+Read `AGENTS.md` and every required `.ai` document before modifying code.
+
+Treat `.ai/REQUIREMENTS.md`, `.ai/DOMAIN_RULES.md`, and `.ai/ARCHITECTURE.md` as canonical. Code changes must include tests, `.ai/CURRENT_STATE.md`, `.ai/CHANGELOG.md`, and any other affected documentation.

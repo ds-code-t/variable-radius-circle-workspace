@@ -1,0 +1,13 @@
+{
+  "circles" : [
+    { "id":1, "x":300.0, "y":300.0, "radius":90.0, "startAngleDeg":0.0, "powered":true, "ownRateDegPerTick":5.0, "slaveContactId":null },
+    { "id":2, "x":450.0, "y":300.0, "radius":60.0, "startAngleDeg":0.0, "powered":false, "ownRateDegPerTick":0.0, "slaveContactId":1 },
+    { "id":3, "x":570.0, "y":300.0, "radius":60.0, "startAngleDeg":0.0, "powered":false, "ownRateDegPerTick":0.0, "slaveContactId":2 }
+  ],
+  "contacts" : [
+    { "id":1, "aId":1, "bId":2, "type":"EXTERNAL", "aTouchDeg":90.0, "bTouchDeg":270.0 },
+    { "id":2, "aId":2, "bId":3, "type":"EXTERNAL", "aTouchDeg":90.0, "bTouchDeg":270.0 }
+  ],
+  "tick":0,
+  "ticksPerSecond":2.0
+}
