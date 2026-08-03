@@ -1,8 +1,8 @@
 ---
-description: Canonical variable-radius circle workspace instructions
+description: Canonical Variable Radius Circle Workspace repository contract
 alwaysApply: true
 ---
 
-Read `AGENTS.md` and every required `.ai` document before modifying code.
+Read and follow repository-root `AGENTS.md` before every analysis, edit, or review. Load the linked `.ai/` context and `docs/agent/feature-map.md` automatically.
 
-Treat `.ai/REQUIREMENTS.md`, `.ai/DOMAIN_RULES.md`, and `.ai/ARCHITECTURE.md` as canonical. Code changes must include tests, `.ai/CURRENT_STATE.md`, `.ai/CHANGELOG.md`, and any other affected documentation.
+Do not ask the user to repeat repository purpose or point to context files. Apply the testing, living-document update, generated-index, and validation rules from `AGENTS.md`.

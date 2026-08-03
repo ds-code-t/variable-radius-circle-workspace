@@ -1,26 +1,55 @@
-name: Agent Context Consistency
+name: Agent Context and Project Validation
 
 on:
-  pull_request:
   push:
-    branches: [ master, main ]
+    branches: ["main"]
+  pull_request:
 
 permissions:
   contents: read
 
 jobs:
-  verify:
+  validate:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Verify agent-context structure
-        run: ./scripts/verify-agent-docs.sh --structure-only
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
 
-      - name: Verify documentation accompanies code changes
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: gradle
+
+      - name: Make scripts executable
+        run: chmod +x gradlew setup-agent.sh scripts/*.sh scripts/*.py
+
+      - name: Verify agent contract
+        run: python scripts/verify_agent_contract.py
+
+      - name: Verify generated repository index
+        run: python scripts/refresh_agent_index.py --check
+
+      - name: Enforce pull-request change coverage
         if: github.event_name == 'pull_request'
         env:
-          AGENT_DOCS_BASE_REF: origin/${{ github.base_ref }}
-        run: ./scripts/verify-agent-docs.sh
+          BASE_REF: origin/${{ github.base_ref }}
+        run: python scripts/verify_agent_contract.py --base-ref "$BASE_REF" --strict
+
+      - name: Run existing documentation checks
+        run: |
+          if [[ -x scripts/verify-agent-docs.sh ]]; then
+            scripts/verify-agent-docs.sh
+          fi
+
+      - name: Run Gradle checks
+        run: ./gradlew clean check

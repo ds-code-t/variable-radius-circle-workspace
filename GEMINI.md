@@ -1,5 +1,5 @@
-# Gemini Project Instructions
+# Gemini Repository Instructions
 
-Read and follow `/AGENTS.md` before modifying this repository.
+Read and follow `/AGENTS.md` before analyzing or changing this repository. Load the canonical `.ai/` context and `docs/agent/feature-map.md` automatically, even when the user does not mention them.
 
-Treat `/.ai/` as canonical. Keep code, tests, requirements, architecture, domain rules, current state, and changelog synchronized in the same change.
+Do not duplicate project requirements in this adapter. Update the canonical living documents and tests as required by `AGENTS.md`.

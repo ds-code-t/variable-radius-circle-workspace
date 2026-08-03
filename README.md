@@ -7,6 +7,18 @@ A fresh rewrite of the variable-radius circle workspace. It uses JavaFX controls
 - JDK 25
 - Internet access on first Gradle run so Gradle can obtain JavaFX 25 and Jackson
 
+## Repository-native AI context
+
+Coding agents should begin with [`AGENTS.md`](AGENTS.md). It automatically directs them to the project purpose, accepted requirements, mathematical/domain rules, architecture, UI behavior, current implementation state, tests, decisions, and living feature map.
+
+The intent is that normal prompts can describe only the requested change; compatible agents should load the repository context, update affected tests and living documents, and run validation without requiring a separate project introduction. See [`AI-DLC.md`](AI-DLC.md).
+
+Initialize or verify the context on Windows:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup-agent.ps1 -StageGit
+```
+
 ## Run
 
 Windows:

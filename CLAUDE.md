@@ -1,7 +1,5 @@
-# Claude Project Instructions
+# Claude Repository Instructions
 
-Read and follow `/AGENTS.md` before modifying this repository.
+Read and follow `/AGENTS.md` before analyzing or changing this repository. Treat the `.ai/` documents and `docs/agent/feature-map.md` named there as mandatory context.
 
-The `/.ai/` directory is the canonical source for project goals, requirements, architecture, mathematics, UI behavior, current status, testing, and documentation-update rules.
-
-Any implementation change must include corresponding tests and `.ai` documentation updates.
+For functionality changes, also use `.claude/skills/variable-radius-circle-functionality-change/SKILL.md` when skill discovery is supported. Keep this adapter brief; shared project truth belongs in `AGENTS.md` or `.ai/`.
