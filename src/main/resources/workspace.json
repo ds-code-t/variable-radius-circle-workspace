@@ -1,13 +1,51 @@
 {
-  "circles" : [
-    { "id":1, "x":300.0, "y":300.0, "radius":90.0, "startAngleDeg":0.0, "powered":true, "ownRateDegPerTick":5.0, "slaveContactId":null },
-    { "id":2, "x":450.0, "y":300.0, "radius":60.0, "startAngleDeg":0.0, "powered":false, "ownRateDegPerTick":0.0, "slaveContactId":1 },
-    { "id":3, "x":570.0, "y":300.0, "radius":60.0, "startAngleDeg":0.0, "powered":false, "ownRateDegPerTick":0.0, "slaveContactId":2 }
+  "version": 4,
+  "shapes": [
+    {
+      "shapeType": "CIRCLE",
+      "id": 1,
+      "x": 300.0,
+      "y": 300.0,
+      "radius": 90.0,
+      "startAngleDeg": 0.0,
+      "powered": true,
+      "rotationRate": 2.0,
+      "rotationRateUnit": "DEGREES_PER_TICK",
+      "slaveContactId": null,
+      "divisionDistribution": "EQUAL_LENGTH",
+      "circumferenceUnits": 61
+    },
+    {
+      "shapeType": "RADIAL",
+      "id": 2,
+      "x": 500.0,
+      "y": 300.0,
+      "radius": 70.0,
+      "startAngleDeg": 0.0,
+      "powered": false,
+      "rotationRate": 0.0,
+      "rotationRateUnit": "DIVISIONS_PER_TICK",
+      "slaveContactId": null,
+      "divisionDistribution": "EQUAL_LENGTH",
+      "radialMultipliers": [
+        1.18,
+        1.0,
+        0.82,
+        1.0,
+        1.18,
+        1.0,
+        0.82,
+        1.0,
+        1.18,
+        1.0,
+        0.82,
+        1.0
+      ],
+      "circumferenceUnits": 37
+    }
   ],
-  "contacts" : [
-    { "id":1, "aId":1, "bId":2, "type":"EXTERNAL", "aTouchDeg":90.0, "bTouchDeg":270.0 },
-    { "id":2, "aId":2, "bId":3, "type":"EXTERNAL", "aTouchDeg":90.0, "bTouchDeg":270.0 }
-  ],
-  "tick":0,
-  "ticksPerSecond":2.0
+  "contacts": [],
+  "tick": 0,
+  "ticksPerSecond": 2.0,
+  "globalMarkerLength": 10.0
 }

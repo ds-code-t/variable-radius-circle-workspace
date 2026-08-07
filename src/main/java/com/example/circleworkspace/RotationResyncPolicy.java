@@ -4,121 +4,89 @@ import java.util.*;
 
 import static com.example.circleworkspace.Model.*;
 
-/**
- * Re-evaluates automatic rotation inheritance for the contact network around a circle.
- * The policy is independent of JavaFX so it can be exercised with unit tests.
- */
 final class RotationResyncPolicy {
-    private RotationResyncPolicy() {
-    }
+    private RotationResyncPolicy() {}
 
-    static List<CircleState> resync(List<CircleState> circles,
-                                    List<ContactState> contacts,
-                                    int changedCircleId,
-                                    long tick) {
-        if (circles.stream().noneMatch(circle -> circle.id() == changedCircleId)) {
-            return List.copyOf(circles);
-        }
-
-        var affectedCircleIds = connectedCircleIds(changedCircleId, contacts);
+    static <S extends WorkspaceShape> List<S> resync(List<S> shapes,
+                                                     List<ContactState> contacts,
+                                                     int changedShapeId,
+                                                     long tick) {
+        if (shapes.stream().noneMatch(shape -> shape.id() == changedShapeId)) return List.copyOf(shapes);
+        var affected = connectedCircleIds(changedShapeId, contacts);
         var orderedContacts = contacts.stream()
-                .filter(contact -> affectedCircleIds.contains(contact.aId())
-                        && affectedCircleIds.contains(contact.bId()))
-                .sorted(Comparator
-                        .comparing((ContactState contact) -> !touches(contact, changedCircleId))
+                .filter(contact -> affected.contains(contact.aId()) && affected.contains(contact.bId()))
+                .sorted(Comparator.comparing((ContactState c) -> !touches(c, changedShapeId))
                         .thenComparingInt(ContactState::id))
                 .toList();
-
-        var updated = new ArrayList<>(circles);
+        var updated = new ArrayList<>(shapes);
         var solver = new RotationSolver();
 
-        // One successful assignment can make the next circle in the chain rotate,
-        // so repeat until no more stopped circles can inherit a rotating neighbor.
-        for (int pass = 0; pass <= affectedCircleIds.size(); pass++) {
+        for (int pass = 0; pass <= affected.size(); pass++) {
             var results = solver.solve(updated, contacts);
             boolean assigned = false;
-
             for (var contact : orderedContacts) {
                 var a = find(updated, contact.aId());
                 var b = find(updated, contact.bId());
                 if (a == null || b == null) continue;
-
                 Integer slaveId = RotationLinkPolicy.chooseSlaveCircle(
                         contact, a, results.get(a.id()), b, results.get(b.id()));
                 if (slaveId == null) continue;
-
-                var replacement = assignPreservingDisplayedAngle(
-                        updated, contacts, slaveId, contact.id(), results, tick, solver);
+                var replacement = assign(updated, contacts, slaveId, contact.id(), results, tick, solver);
                 if (replacement == null) continue;
-
                 replace(updated, replacement);
                 assigned = true;
                 break;
             }
-
             if (!assigned) break;
         }
-
         return List.copyOf(updated);
     }
 
-    static Set<Integer> connectedCircleIds(int startingCircleId, List<ContactState> contacts) {
+    static Set<Integer> connectedCircleIds(int startingShapeId, List<ContactState> contacts) {
         var connected = new LinkedHashSet<Integer>();
         var queue = new ArrayDeque<Integer>();
-        connected.add(startingCircleId);
-        queue.add(startingCircleId);
-
+        connected.add(startingShapeId);
+        queue.add(startingShapeId);
         while (!queue.isEmpty()) {
-            int circleId = queue.removeFirst();
+            int id = queue.removeFirst();
             for (var contact : contacts) {
-                if (!touches(contact, circleId)) continue;
-                int otherId = contact.other(circleId);
-                if (connected.add(otherId)) queue.addLast(otherId);
+                if (!touches(contact, id)) continue;
+                int other = contact.other(id);
+                if (connected.add(other)) queue.addLast(other);
             }
         }
-
         return Set.copyOf(connected);
     }
 
-    private static CircleState assignPreservingDisplayedAngle(
-            List<CircleState> circles,
-            List<ContactState> contacts,
-            int slaveId,
-            int contactId,
-            Map<Integer, RotationSolver.Result> currentResults,
-            long tick,
-            RotationSolver solver) {
-        var circle = find(circles, slaveId);
-        var currentResult = currentResults.get(slaveId);
-        if (circle == null || circle.powered() || currentResult == null) return null;
-
-        var candidateCircles = new ArrayList<>(circles);
-        replace(candidateCircles, circle.withSlave(contactId));
-        var slavedResult = solver.solve(candidateCircles, contacts).get(slaveId);
-        if (slavedResult == null
-                || slavedResult.mode() != DriveMode.SLAVED
-                || !RotationLinkPolicy.isActivelyRotating(slavedResult)) {
-            return null;
-        }
-
-        return RotationLinkPolicy.slavePreservingDisplayedAngle(
-                circle, contactId, currentResult, slavedResult, tick);
+    @SuppressWarnings("unchecked")
+    private static <S extends WorkspaceShape> S assign(
+            List<S> shapes, List<ContactState> contacts, int slaveId, int contactId,
+            Map<Integer, RotationSolver.Result> currentResults, long tick, RotationSolver solver) {
+        S shape = find(shapes, slaveId);
+        var current = currentResults.get(slaveId);
+        if (shape == null || shape.powered() || current == null) return null;
+        var candidates = new ArrayList<>(shapes);
+        replace(candidates, (S) shape.withSlave(contactId));
+        var slaved = solver.solve(candidates, contacts).get(slaveId);
+        if (slaved == null || slaved.mode() != DriveMode.SLAVED
+                || !RotationLinkPolicy.isActivelyRotating(slaved)) return null;
+        return RotationLinkPolicy.slavePreservingDisplayedAngle(shape, contactId, current, slaved, tick);
     }
 
-    private static CircleState find(List<CircleState> circles, int id) {
-        return circles.stream().filter(circle -> circle.id() == id).findFirst().orElse(null);
+    private static <S extends WorkspaceShape> S find(List<S> shapes, int id) {
+        return shapes.stream().filter(shape -> shape.id() == id).findFirst().orElse(null);
     }
 
-    private static void replace(List<CircleState> circles, CircleState replacement) {
-        for (int i = 0; i < circles.size(); i++) {
-            if (circles.get(i).id() == replacement.id()) {
-                circles.set(i, replacement);
+    private static <S extends WorkspaceShape> void replace(List<S> shapes, S replacement) {
+        for (int i = 0; i < shapes.size(); i++) {
+            if (shapes.get(i).id() == replacement.id()) {
+                shapes.set(i, replacement);
                 return;
             }
         }
     }
 
-    private static boolean touches(ContactState contact, int circleId) {
-        return contact.aId() == circleId || contact.bId() == circleId;
+    private static boolean touches(ContactState contact, int id) {
+        return contact.aId() == id || contact.bId() == id;
     }
 }
